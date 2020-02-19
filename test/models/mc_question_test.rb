@@ -17,4 +17,40 @@ class McQuestionTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
+  test "fixtures are valid" do
+    mc_questions.each do |q|
+      assert q.valid?, q.errors.full_messages.inspect
+    end
+  end
+
+  test "question presence not valid" do
+    q = mc_questions(:one)
+    q.question = nil
+    assert_not q.valid?
+    q.question = ""
+    assert_not q.valid?
+  end
+
+  test "question uniqueness not valid" do
+    one = mc_questions(:one)
+    two = mc_questions(:two)
+
+    one.question = two.question
+
+    assert_not one.valid?
+  end
+
+  test "choices cannot be duplicate not valid" do
+    q = mc_questions(:one)
+    q.distractor_1 = q.answer
+    assert_not q.valid?
+
+    q = mc_questions(:one)
+    q.distractor_2 = q.answer
+    assert_not q.valid?
+
+    q = mc_questions(:one)
+    q.distractor_1 = q.distractor_2
+    assert_not q.valid?
+  end
 end
